@@ -18,11 +18,16 @@ using std::endl;
 using std::stringstream;
 using std::vector;
 
-// Initialize classes
+// Initialize Classes
 class Node;
 class Edge;
 class LinkedList;
 class Graph;
+
+// Initialize Methods
+int getMagiSequenceInt(int array[], int arraySize);
+string getMagiSequenceString(int array[], int arraySize);
+int getEditDistance(string word1, int l1, string word2, int l2);
 
 // This is a basic edge class that connects two nodes
 class Edge {
@@ -59,6 +64,7 @@ public:
     string charm;
     int id;
     Node *next;
+    int lISLength;
     
     Node(string x, int identity) {
         charm = x;
@@ -162,9 +168,19 @@ class Graph {
     
 public:
     
+    // Looks weird but is a dynamic array of node pointers
+    Node* *nodes;
+    
     Graph(int numOfVertices) {
         this->numOfVertices = numOfVertices;
         adjNodeList = new LinkedList[numOfVertices];
+        nodes = new Node*[numOfVertices];
+    }
+    
+    void addNodeToArray(string charm, int id, int LISLength) {
+        Node *node = new Node(charm, id);
+        node->lISLength = LISLength;
+        nodes[id] = node;
     }
     
     void addEdgeUnidirectional(Node *v1, Node *v2, int weight) {
@@ -258,8 +274,7 @@ int ceilIndex(int array[], int left, int right, int key) {
     return right;
 }
 
-// This gets the ideal squence of magi powers dynamically O(n * log(n))
-int getMagiSequence(int array[], int arraySize) {
+int getMagiSequenceInt(int array[], int arraySize) {
     
     int *tailArray = new int[arraySize];
     int length = 0;
@@ -300,6 +315,50 @@ int getMagiSequence(int array[], int arraySize) {
     delete[] tailArray;
     
     return length;
+}
+
+// This gets the ideal squence of magi powers dynamically O(n * log(n))
+string getMagiSequenceString(int array[], int arraySize) {
+    
+    int *tailArray = new int[arraySize];
+    int length = 0;
+    
+    string outSequence = "";
+    
+    for (int i = 0; i < arraySize; i++) {
+        tailArray[i] = 0;
+    }
+    
+    tailArray[0] = array[0];
+    length = 1;
+    for (int i = 1; i < arraySize; i++) {
+        if (array[i] < tailArray[0]) {
+            // new smallest value could start new sequence that is better
+            tailArray[0] = array[i];
+        }
+        
+        else if (array[i] > tailArray[length-1]) {
+            // array[i] wants to extend largest subsequence
+            tailArray[length++] = array[i];
+        }
+        
+        else {
+            // array[i] wants to be current end candidate of an existing subsequence
+            tailArray[ceilIndex(tailArray, -1, length-1, array[i])] = array[i];
+        }
+    }
+    
+    stringstream ss;
+    for (int i = 0; i < length; i++) {
+        ss << tailArray[i] << " ";
+    }
+    
+    // Was not sure if we should return the length or the sequence itself
+    outSequence = ss.str();
+    
+    delete[] tailArray;
+    
+    return outSequence;
 }
 
 // This is the edit distance dynamically O(l1 x l2)
@@ -345,6 +404,8 @@ int main() {
     int numOfRealms = 0;
     cin >> numOfRealms;
     
+    Graph graph(numOfRealms);
+    
     for (int i = 0; i < numOfRealms; i++) {
         string charmOfRealm = "";
         cin >> charmOfRealm;
@@ -357,18 +418,22 @@ int main() {
             cin >> powerOfMagi;
             magiArray[j] = powerOfMagi;
         }
+        
+        int lengthOfLIS = getMagiSequenceInt(magiArray, numOfMagi);
+        graph.addNodeToArray(charmOfRealm, i, lengthOfLIS);
+        
     }
+    
+//    // call method inside graph class to connect all nodes and set edges
+//    setupGraph();
     
     string kaelCharm = "";
     cin >> kaelCharm;
     string destCharm = "";
     cin >> destCharm;
     
-    int numOfIncantsTo = 0;
-    int numOfGemsTo = 0;
-    
-    int numOfIncantsFrom = 0;
-    int numOfGemsFrom = 0;
+//    // call method inside graph class to find shortest path
+//    callDjikstra();
     
     cout << "\n";
     return 0;
