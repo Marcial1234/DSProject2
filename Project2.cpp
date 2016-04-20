@@ -71,6 +71,7 @@ public:
     int id;
     Node *next;
     int lISLength;
+    double minDistance = std::numeric_limits<double>::infinity();
     
     Node(string x, int identity)
     {
@@ -276,7 +277,7 @@ public:
         for (int i = 0; i < numOfVertices; i++)
         {
             cout << "From vertex " << i << ":\n";
-            adjNodeList[i].publicHead->printEdges();
+            nodes[i]->printEdges();
             cout << "\n";
         }
     }
@@ -464,6 +465,41 @@ int getEditDistance(string word1, int l1, string word2, int l2)
     return resultsArray[l1][l2];
 }
 
+//void computePaths(Node *source) {
+//    
+//    source.minDistance = 0.;
+//    PriorityQueue<Vertex> vertexQueue = new PriorityQueue<Vertex>();
+//    vertexQueue.add(source);
+//    
+//    while (!vertexQueue.isEmpty()) {
+//        Vertex u = vertexQueue.poll();
+//        
+//        // Visit each edge exiting u
+//        for (Edge e : u.adjacencies)
+//        {
+//            Vertex v = e.target;
+//            double weight = e.weight;
+//            double distanceThroughU = u.minDistance + weight;
+//            if (distanceThroughU < v.minDistance) {
+//                vertexQueue.remove(v);
+//                
+//                v.minDistance = distanceThroughU ;
+//                v.previous = u;
+//                vertexQueue.add(v);
+//            }
+//        }
+//    }
+//}
+//
+//vector<Node> getShortestPathTo(Node *target) {
+//    List<Vertex> path = new ArrayList<Vertex>();
+//    for (Vertex vertex = target; vertex != null; vertex = vertex.previous)
+//        path.add(vertex);
+//    
+//    Collections.reverse(path);
+//    return path;
+//}
+
 int main()
 {
     int numOfRealms = 0;
@@ -491,13 +527,15 @@ int main()
         
     }
     
-    //    // call method inside graph class to connect all nodes and set edges
+    // call method inside graph class to connect all nodes and set edges
     graph.setupGraph();
     
     string kaelCharm = "";
     cin >> kaelCharm;
     string destCharm = "";
     cin >> destCharm;
+    
+    graph.printEdges();
     
     //    // call method inside graph class to find shortest path
     //    callDjikstra();
