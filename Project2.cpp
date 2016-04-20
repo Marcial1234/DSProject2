@@ -184,7 +184,6 @@ public:
 // This is a basic graph class
 class Graph
 {
-    
     int numOfVertices;
     LinkedList *adjNodeList;
     
@@ -282,6 +281,16 @@ public:
         }
     }
     
+    void setupGraph()
+    {
+        for(int i = 0; i < numOfVertices; i++)
+        {
+            for(int j = i + 1; j < numOfVertices; j++)
+            {
+                addEdgeBidirectional(nodes[i], nodes[j], getEditDistance(nodes[i]->charm, (int)nodes[i]->charm.length(), nodes[j]->charm, (int)nodes[j]->charm.length()));
+            }
+        }
+    }
 };
 
 // Get the min of three numbers
@@ -483,7 +492,7 @@ int main()
     }
     
     //    // call method inside graph class to connect all nodes and set edges
-    //    setupGraph();
+    graph.setupGraph();
     
     string kaelCharm = "";
     cin >> kaelCharm;
@@ -496,8 +505,3 @@ int main()
     cout << "\n";
     return 0;
 }
-
-
-
-
-
