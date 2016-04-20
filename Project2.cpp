@@ -8,6 +8,8 @@
 
 #include <iostream>
 #include <sstream>
+#include <list>
+#include <vector>
 
 using std::cin;
 using std::cout;
@@ -15,22 +17,13 @@ using std::string;
 using std::min;
 using std::endl;
 using std::stringstream;
+using std::vector;
 
-// This is a basic node class
-class Node {
-    string charm;
-    Node * next;
-    
-public:
-    Node(string x) {
-        charm = x;
-        next = NULL;
-    }
-    Node(string x, Node *y) {
-        charm = x;
-        next = y;
-    }
-};
+// Initialize classes
+class Node;
+class Edge;
+class LinkedList;
+class Graph;
 
 // This is a basic edge class that connects two nodes
 class Edge {
@@ -56,6 +49,130 @@ public:
     int getWeight() {
         return weight;
     }
+};
+
+// This is a basic node class
+class Node {
+    // list of every edge from this node
+    vector<Edge*> edges;
+    
+public:
+    string charm;
+    int id;
+    Node *next;
+    
+    Node(string x, int identity) {
+        charm = x;
+        id = identity;
+        next = NULL;
+    }
+    Node(string x, int identity, Node *n) {
+        charm = x;
+        id = identity;
+        next = n;
+    }
+    
+    void addEdge(Node *node, int weight) {
+        Edge *myEdge = new Edge(this, node, weight);
+        edges.push_back(myEdge);
+    }
+    
+    void printEdges() {
+        cout << charm << ":" << endl;
+        for (int i = 0; i < edges.size(); i++) {
+            Edge *edge = edges[i];
+            cout << "Dest: " << edge->getDestination()->charm << " with weight: " << edge->getWeight() << endl;
+        }
+        cout << endl;
+    }
+};
+
+// This is a basic linked list class
+class LinkedList{
+    Node *head;
+    Node *tail;
+public:
+    
+    Node *publicHead;
+    
+    LinkedList(){
+        head = NULL;
+        publicHead = NULL;
+        tail = NULL;
+    }
+    
+    int getAbs(int num) {
+        
+        int ans = 0;
+        
+        if (num < 0) {
+            ans = 0 - num;
+        }
+        else if (num > 0) {
+            ans = num;
+        }
+        
+        return ans;
+    }
+    
+    void addNodeToTail(string value, int id) {
+        Node *p;
+        
+        if(head == NULL) {
+            head = new Node(value, id, NULL);
+            publicHead = head;
+            tail = head;
+        }
+        else {
+            p = tail;
+            p->next = new Node(value, id, NULL);
+            tail = p->next;
+        }
+    }
+    
+    void printListOfValues() {
+        Node *p = head;
+        while(p != NULL) {
+            cout << p->charm << "\t";
+            p = p->next;
+        }
+    }
+    
+};
+
+// This is a basic graph class
+class Graph {
+    
+    int numOfVertices;
+    LinkedList *adjNodeList;
+    
+public:
+    
+    Graph(int numOfVertices) {
+        this->numOfVertices = numOfVertices;
+        adjNodeList = new LinkedList[numOfVertices];
+        
+    }
+    
+    void addEdge(Node *v1, Node *v2, int weight) {
+        // Add v2 to v1’s list for a one directional graph
+        v1->addEdge(v2, weight);
+        adjNodeList[v1->id].addNodeToTail(v2->charm, v2->id);
+    }
+    
+    void printAllVertices() {
+        for (int i = 0; i < numOfVertices; i++) {
+            cout << "From vertex " << i << ":\n";
+            adjNodeList[i].printListOfValues();
+            cout << "\n";
+        }
+    }
+    
+    void printVerticesFrom(int id) {
+        cout << "From vertex " << id << ":\n";
+        adjNodeList[id].printListOfValues();
+    }
+    
 };
 
 // Get the min of three numbers
@@ -126,44 +243,6 @@ int getMagiSequence(int array[], int arraySize) {
     return length;
 }
 
-//// This gets the ideal squence of magi powers dynamically O(n^2)
-//int getMagiSequence(int array[], int arraySize) {
-//    
-//    int *temp = new int[arraySize];
-//    int i = 0;
-//    int j = 0;
-//    int max = 0;
-//    
-//    string sequence = "";
-//    
-//    // Give all indices values
-//    for (i = 0; i < arraySize; i++) {
-//        temp[i] = 1;
-//    }
-//    
-//    // Optimized temp values by bottom up
-//    for (i = 1; i < arraySize; i++) {
-//        for (j = 0; j < i; j++ ) {
-//            if ( array[i] > array[j] && temp[i] < temp[j] + 1) {
-//                temp[i] = temp[j] + 1;
-//            }
-//        }
-//    }
-//    
-//    // Pick max of temp values
-//    for (i = 0; i < arraySize; i++) {
-//        if (max < temp[i]) {
-//            max = temp[i];
-//        }
-//    }
-//    
-//    // Remove temp from memory
-//    delete[] temp;
-//    
-//    return max;
-//    
-//}
-
 // This is the edit distance dynamically O(l1 x l2)
 int getEditDistance(string word1, int l1, string word2, int l2) {
     
@@ -204,21 +283,21 @@ int getEditDistance(string word1, int l1, string word2, int l2) {
 
 int main() {
 
-    int numOfRealms = 0;
-//    cin >> numOfRealms;
-    
-    string charmOfRealm = "";
-    int numOfMagi = 0;
-    int powerOfMagi = 0;
-    
-    string kaelCharm = "";
-    string destCharm = "";
-    
-    int numOfIncantsTo = 0;
-    int numOfGemsTo = 0;
-    
-    int numOfIncantsFrom = 0;
-    int numOfGemsFrom = 0;
+//    int numOfRealms = 0;
+////    cin >> numOfRealms;
+//    
+//    string charmOfRealm = "";
+//    int numOfMagi = 0;
+//    int powerOfMagi = 0;
+//    
+//    string kaelCharm = "";
+//    string destCharm = "";
+//    
+//    int numOfIncantsTo = 0;
+//    int numOfGemsTo = 0;
+//    
+//    int numOfIncantsFrom = 0;
+//    int numOfGemsFrom = 0;
     
     int array[] = { 2, 5, 3, 1, 7, 11, 8, 10, 13, 6 };
     int length = getMagiSequence(array, 10);
