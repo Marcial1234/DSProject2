@@ -342,21 +342,33 @@ int getEditDistance(string word1, int l1, string word2, int l2) {
 
 int main() {
 
-//    int numOfRealms = 0;
-////    cin >> numOfRealms;
-//    
-//    string charmOfRealm = "";
-//    int numOfMagi = 0;
-//    int powerOfMagi = 0;
-//    
-//    string kaelCharm = "";
-//    string destCharm = "";
-//    
-//    int numOfIncantsTo = 0;
-//    int numOfGemsTo = 0;
-//    
-//    int numOfIncantsFrom = 0;
-//    int numOfGemsFrom = 0;
+    int numOfRealms = 0;
+    cin >> numOfRealms;
+    
+    for (int i = 0; i < numOfRealms; i++) {
+        string charmOfRealm = "";
+        cin >> charmOfRealm;
+        int numOfMagi = 0;
+        cin >> numOfMagi;
+        int magiArray[numOfMagi];
+        
+        for (int j = 0; j < numOfMagi; j++) {
+            int powerOfMagi = 0;
+            cin >> powerOfMagi;
+            magiArray[j] = powerOfMagi;
+        }
+    }
+    
+    string kaelCharm = "";
+    cin >> kaelCharm;
+    string destCharm = "";
+    cin >> destCharm;
+    
+    int numOfIncantsTo = 0;
+    int numOfGemsTo = 0;
+    
+    int numOfIncantsFrom = 0;
+    int numOfGemsFrom = 0;
     
     cout << "\n";
     return 0;
