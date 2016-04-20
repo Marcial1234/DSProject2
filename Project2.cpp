@@ -8,7 +8,6 @@
 
 #include <iostream>
 #include <sstream>
-#include <list>
 #include <vector>
 
 using std::cin;
@@ -130,6 +129,21 @@ public:
         }
     }
     
+    void appendNodeToTail(Node *node) {
+        Node *p;
+        
+        if(head == NULL) {
+            head = node;
+            publicHead = head;
+            tail = head;
+        }
+        else {
+            p = tail;
+            p->next = node;
+            tail = p->next;
+        }
+    }
+    
     void printListOfValues() {
         Node *p = head;
         while(p != NULL) {
@@ -151,15 +165,52 @@ public:
     Graph(int numOfVertices) {
         this->numOfVertices = numOfVertices;
         adjNodeList = new LinkedList[numOfVertices];
-        
     }
     
-    void addEdge(Node *v1, Node *v2, int weight) {
-        // Add v2 to v1’s list for a one directional graph
+    void addEdgeUnidirectional(Node *v1, Node *v2, int weight) {
         v1->addEdge(v2, weight);
-        adjNodeList[v1->id].addNodeToTail(v2->charm, v2->id);
+        adjNodeList[v1->id].appendNodeToTail(v2);
     }
     
+    void addEdgeBidirectional(Node *v1, Node *v2, int weight) {
+        v1->addEdge(v2, weight);
+        adjNodeList[v1->id].appendNodeToTail(v2);
+        
+        v2->addEdge(v1, weight);
+        adjNodeList[v2->id].appendNodeToTail(v1);
+    }
+    
+    void createV1NodeAndEdge(string charm, int id, Node *v2, int weight) {
+        Node *v1 = new Node(charm, id);
+        
+        v1->addEdge(v2, weight);
+        adjNodeList[v1->id].appendNodeToTail(v2);
+        
+        v2->addEdge(v1, weight);
+        adjNodeList[v2->id].appendNodeToTail(v1);
+    }
+    
+    void createV2NodeAndEdge(Node *v1, string charm, int id, int weight) {
+        Node *v2 = new Node(charm, id);
+        
+        v1->addEdge(v2, weight);
+        adjNodeList[v1->id].appendNodeToTail(v2);
+        
+        v2->addEdge(v1, weight);
+        adjNodeList[v2->id].appendNodeToTail(v1);
+    }
+    
+    void createBothNodesAndEdge(string charm1, int id1, string charm2, int id2, int weight) {
+        Node *v1 = new Node(charm1, id1);
+        Node *v2 = new Node(charm2, id2);
+        
+        v1->addEdge(v2, weight);
+        adjNodeList[v1->id].appendNodeToTail(v2);
+        
+        v2->addEdge(v1, weight);
+        adjNodeList[v2->id].appendNodeToTail(v1);
+    }
+
     void printAllVertices() {
         for (int i = 0; i < numOfVertices; i++) {
             cout << "From vertex " << i << ":\n";
