@@ -9,6 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <queue>
 
 using std::cin;
 using std::cout;
@@ -17,12 +18,14 @@ using std::min;
 using std::endl;
 using std::stringstream;
 using std::vector;
+using std::priority_queue;
 
 // Initialize Classes
 class Node;
 class Edge;
 class LinkedList;
 class Graph;
+class Dijkstra;
 
 // Initialize Methods
 int getMagiSequenceInt(int array[], int arraySize);
@@ -72,6 +75,8 @@ public:
     Node *next;
     int lISLength;
     double minDistance = std::numeric_limits<double>::infinity();
+    vector<Edge*> pubEdges;
+    Node *previous = NULL;
     
     Node(string x, int identity)
     {
@@ -90,6 +95,7 @@ public:
     {
         Edge *myEdge = new Edge(this, node, weight);
         edges.push_back(myEdge);
+        pubEdges = edges;
     }
     
     void printEdges()
@@ -294,6 +300,83 @@ public:
     }
 };
 
+// A class for holding Dijkstra's algorithm
+class Dijkstra {
+    
+    Graph graph = NULL;
+    
+public:
+    
+    Dijkstra(Graph g){
+        graph = g;
+    }
+    
+    void computePaths(Node *source) {
+        source->minDistance = 0;
+        priority_queue<Node*> vertexQueue;
+        vertexQueue.push(source);
+        
+        while (!vertexQueue.empty()) {
+            Node *u = vertexQueue.top();
+            vertexQueue.pop();
+            
+            // Visit each edge exiting u
+            for (Edge *e : u->pubEdges) {
+                Node *v = e->getDestination();
+                double weight = e->getWeight();
+                double distanceThroughU = u->minDistance + weight;
+                if (distanceThroughU < v->minDistance && u->lISLength >= e->getWeight()) {
+                    
+                    priority_queue<Node*> tempQueue;
+                    bool done = false;
+                    while (!vertexQueue.empty()) {
+                        if (vertexQueue.top() == v && !done) {
+                            vertexQueue.pop();
+                            done = true;
+                        }
+                        else {
+                            Node *p = vertexQueue.top();
+                            tempQueue.push(p);
+                            vertexQueue.pop();
+                        }
+                    }
+                    
+                    vertexQueue = tempQueue;
+                    
+                    v->minDistance = distanceThroughU ;
+                    v->previous = u;
+                    vertexQueue.push(v);
+                }
+            }
+        }
+    }
+    
+    vector<Node*> getShortestPathTo(Node *target) {
+        vector<Node*> path;
+        for (Node *vertex = target; vertex != NULL; vertex = vertex->previous) {
+            path.push_back(vertex);
+        }
+        
+        std::reverse(path.begin(), path.end());
+        
+        return path;
+    }
+    
+    void printPath(vector<Node*> vec) {
+        for (int i = 0; i < vec.size(); i++) {
+            cout << vec[i]->charm << "\n";
+        }
+    }
+    
+    void doDijkstra(int start, int end) {
+        
+        computePaths(graph.nodes[start]);
+        vector<Node*> result = getShortestPathTo(graph.nodes[end]);
+        
+        printPath(result);
+    }
+};
+
 // Get the min of three numbers
 int getMin(int a, int b, int c)
 {
@@ -465,41 +548,6 @@ int getEditDistance(string word1, int l1, string word2, int l2)
     return resultsArray[l1][l2];
 }
 
-//void computePaths(Node *source) {
-//    
-//    source.minDistance = 0.;
-//    PriorityQueue<Vertex> vertexQueue = new PriorityQueue<Vertex>();
-//    vertexQueue.add(source);
-//    
-//    while (!vertexQueue.isEmpty()) {
-//        Vertex u = vertexQueue.poll();
-//        
-//        // Visit each edge exiting u
-//        for (Edge e : u.adjacencies)
-//        {
-//            Vertex v = e.target;
-//            double weight = e.weight;
-//            double distanceThroughU = u.minDistance + weight;
-//            if (distanceThroughU < v.minDistance) {
-//                vertexQueue.remove(v);
-//                
-//                v.minDistance = distanceThroughU ;
-//                v.previous = u;
-//                vertexQueue.add(v);
-//            }
-//        }
-//    }
-//}
-//
-//vector<Node> getShortestPathTo(Node *target) {
-//    List<Vertex> path = new ArrayList<Vertex>();
-//    for (Vertex vertex = target; vertex != null; vertex = vertex.previous)
-//        path.add(vertex);
-//    
-//    Collections.reverse(path);
-//    return path;
-//}
-
 int main()
 {
     int numOfRealms = 0;
@@ -535,10 +583,9 @@ int main()
     string destCharm = "";
     cin >> destCharm;
     
-    graph.printEdges();
+    Dijkstra dj(graph);
+    dj.doDijkstra(0, 3);
     
-    //    // call method inside graph class to find shortest path
-    //    callDjikstra();
     
     cout << "\n";
     return 0;
