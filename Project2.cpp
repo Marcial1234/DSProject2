@@ -198,10 +198,12 @@ public:
     
     // Looks weird but is a dynamic array of node pointers
     Node* *nodes;
+    int pubNumOfVertices;
     
     Graph(int numOfVertices)
     {
         this->numOfVertices = numOfVertices;
+        pubNumOfVertices = numOfVertices;
         adjNodeList = new LinkedList[numOfVertices];
         nodes = new Node*[numOfVertices];
     }
@@ -262,6 +264,21 @@ public:
         adjNodeList[v2->id].appendNodeToTail(v1);
     }
     
+    int findIDWithCharm(string charm) {
+        Node *p = nodes[0];
+        
+        while (p != NULL && p->charm != charm) {
+            p = p->next;
+        }
+        
+        if (p != NULL) {
+            return p->id;
+        }
+        else {
+            return -1;
+        }
+    }
+    
     void printAllVertices()
     {
         for (int i = 0; i < numOfVertices; i++)
@@ -303,9 +320,9 @@ public:
 // A class for holding Dijkstra's algorithm
 class Dijkstra {
     
-    Graph graph = NULL;
-    
 public:
+    
+    Graph graph = NULL;
     
     Dijkstra(Graph g){
         graph = g;
@@ -362,18 +379,36 @@ public:
         return path;
     }
     
-    void printPath(vector<Node*> vec) {
-        for (int i = 0; i < vec.size(); i++) {
-            cout << vec[i]->charm << "\n";
+    void printPath(vector<Node*> vec, int start, int end) {
+        
+        if (graph.nodes[start] != graph.nodes[end] && vec.size() == 1 && vec[vec.size()-1] == graph.nodes[end]) {
+            cout << "IMPOSSIBLE" << endl;
+        }
+        else {
+            for (int i = 0; i < vec.size(); i++) {
+                cout << vec[i]->charm << "\n";
+            }
+        }
+    }
+    
+    void resetNodes() {
+        for (int i = 0; i < graph.pubNumOfVertices; i++) {
+            graph.nodes[i]->previous = NULL;
+            graph.nodes[i]->minDistance = std::numeric_limits<double>::infinity();
         }
     }
     
     void doDijkstra(int start, int end) {
-        
-        computePaths(graph.nodes[start]);
-        vector<Node*> result = getShortestPathTo(graph.nodes[end]);
-        
-        printPath(result);
+        if (start == -1 || end == -1) {
+            cout << "IMPOSSIBLE" << endl;
+        }
+        else {
+            resetNodes();
+            computePaths(graph.nodes[start]);
+            vector<Node*> result = getShortestPathTo(graph.nodes[end]);
+            
+            printPath(result, start, end);
+        }
     }
 };
 
@@ -583,9 +618,12 @@ int main()
     string destCharm = "";
     cin >> destCharm;
     
-    Dijkstra dj(graph);
-    dj.doDijkstra(0, 3);
+    int startIndex = graph.findIDWithCharm(kaelCharm);
+    int endIndex = graph.findIDWithCharm(destCharm);
     
+    Dijkstra dj(graph);
+    dj.doDijkstra(startIndex, endIndex);
+    dj.doDijkstra(endIndex, startIndex);
     
     cout << "\n";
     return 0;
