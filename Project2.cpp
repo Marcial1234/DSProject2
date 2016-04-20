@@ -147,7 +147,7 @@ public:
     void printListOfValues() {
         Node *p = head;
         while(p != NULL) {
-            cout << p->charm << "\t";
+            cout << p->charm << " ";
             p = p->next;
         }
     }
@@ -350,9 +350,27 @@ int main() {
 //    int numOfIncantsFrom = 0;
 //    int numOfGemsFrom = 0;
     
-    int array[] = { 2, 5, 3, 1, 7, 11, 8, 10, 13, 6 };
-    int length = getMagiSequence(array, 10);
-    cout << "\n" << length << "\n";
+//    int array[] = { 2, 5, 3, 1, 7, 11, 8, 10, 13, 6 };
+//    int length = getMagiSequence(array, 10);
+//    cout << "\n" << length << "\n";
+    
+//    Graph graph(4);
+//    Node *n0 = new Node("sitting", 0);
+//    Node *n1 = new Node("knitting", 1);
+//    Node *n2 = new Node("knowing", 2);
+//    Node *n3 = new Node("kneeding", 3);
+//    
+//    graph.addEdgeUnidirectional(n0, n1, 10);
+//    graph.addEdgeUnidirectional(n0, n2, 12);
+//    graph.addEdgeUnidirectional(n0, n3, 14);
+//    
+//    graph.addEdgeUnidirectional(n1, n2, 20);
+//    graph.addEdgeUnidirectional(n1, n3, 22);
+//    
+//    graph.addEdgeUnidirectional(n2, n3, 30);
+//    graph.addEdgeUnidirectional(n3, n1, 40);
+//    
+//    graph.printVerticesFrom(3);
     
     cout << "\n";
     return 0;
