@@ -16,6 +16,48 @@ using std::min;
 using std::endl;
 using std::stringstream;
 
+// This is a basic node class
+class Node {
+    string charm;
+    Node * next;
+    
+public:
+    Node(string x) {
+        charm = x;
+        next = NULL;
+    }
+    Node(string x, Node *y) {
+        charm = x;
+        next = y;
+    }
+};
+
+// This is a basic edge class that connects two nodes
+class Edge {
+    Node *origin;
+    Node *destination;
+    int weight;
+    
+public:
+    Edge(Node *beginNode, Node *endNode, int w) {
+        origin = beginNode;
+        destination = endNode;
+        weight = w;
+    }
+    
+    Node* getOrigin() {
+        return origin;
+    }
+    
+    Node* getDestination() {
+        return destination;
+    }
+    
+    int getWeight() {
+        return weight;
+    }
+};
+
 // Get the min of three numbers
 int getMin(int a, int b, int c) {
     
