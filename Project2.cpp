@@ -19,6 +19,7 @@ using std::endl;
 using std::stringstream;
 using std::vector;
 using std::priority_queue;
+using std::queue;
 
 // Initialize Classes
 class Node;
@@ -29,8 +30,11 @@ class Dijkstra;
 
 // Initialize Methods
 int getMagiSequenceInt(int array[], int arraySize);
-string getMagiSequenceString(int array[], int arraySize);
+vector<int> getMagiSequenceVector(int array[], int arraySize);
 int getEditDistance(string word1, int l1, string word2, int l2);
+
+// Global queue for keepin track of the important edges
+//queue<int> globalEdgeQueue;
 
 // This is a basic edge class that connects two nodes
 class Edge
@@ -73,7 +77,7 @@ public:
     string charm;
     int id;
     Node *next;
-    int lISLength;
+    vector<int> lis;
     double minDistance = std::numeric_limits<double>::infinity();
     vector<Edge*> pubEdges;
     Node *previous = NULL;
@@ -208,10 +212,10 @@ public:
         nodes = new Node*[numOfVertices];
     }
     
-    void addNodeToArray(string charm, int id, int LISLength)
+    void addNodeToArray(string charm, int id, vector<int> lis)
     {
         Node *node = new Node(charm, id);
-        node->lISLength = LISLength;
+        node->lis = lis;
         nodes[id] = node;
     }
     
@@ -342,7 +346,7 @@ public:
                 Node *v = e->getDestination();
                 double weight = e->getWeight();
                 double distanceThroughU = u->minDistance + weight;
-                if (distanceThroughU < v->minDistance && u->lISLength >= e->getWeight()) {
+                if (distanceThroughU < v->minDistance && u->lis.size() >= e->getWeight()) {
                     
                     priority_queue<Node*> tempQueue;
                     bool done = false;
@@ -363,6 +367,7 @@ public:
                     v->minDistance = distanceThroughU ;
                     v->previous = u;
                     vertexQueue.push(v);
+                    
                 }
             }
         }
@@ -385,9 +390,13 @@ public:
             cout << "IMPOSSIBLE" << endl;
         }
         else {
+            int edgeSum = 0;
+            int gemSum = 0;
             for (int i = 0; i < vec.size(); i++) {
-                cout << vec[i]->charm << "\n";
+                cout << vec[i]->charm << endl;
             }
+            
+            cout << edgeSum << endl;
         }
     }
     
@@ -437,64 +446,14 @@ int ceilIndex(int array[], int left, int right, int key)
     return right;
 }
 
-int getMagiSequenceInt(int array[], int arraySize)
-{
-    
-    int *tailArray = new int[arraySize];
-    int length = 0;
-    
-    string outSequence = "";
-    
-    for (int i = 0; i < arraySize; i++)
-    {
-        tailArray[i] = 0;
-    }
-    
-    tailArray[0] = array[0];
-    length = 1;
-    for (int i = 1; i < arraySize; i++)
-    {
-        if (array[i] < tailArray[0])
-        {
-            // new smallest value could start new sequence that is better
-            tailArray[0] = array[i];
-        }
-        
-        else if (array[i] > tailArray[length-1])
-        {
-            // array[i] wants to extend largest subsequence
-            tailArray[length++] = array[i];
-        }
-        
-        else
-        {
-            // array[i] wants to be current end candidate of an existing subsequence
-            tailArray[ceilIndex(tailArray, -1, length-1, array[i])] = array[i];
-        }
-    }
-    
-    stringstream ss;
-    for (int i = 0; i < length; i++)
-    {
-        ss << tailArray[i] << " ";
-    }
-    
-    // Was not sure if we should return the length or the sequence itself
-    outSequence = ss.str();
-    
-    delete[] tailArray;
-    
-    return length;
-}
-
 // This gets the ideal squence of magi powers dynamically O(n * log(n))
-string getMagiSequenceString(int array[], int arraySize)
+vector<int> getMagiSequenceVector(int array[], int arraySize)
 {
     
     int *tailArray = new int[arraySize];
     int length = 0;
     
-    string outSequence = "";
+    vector<int> outSequence;
     
     for (int i = 0; i < arraySize; i++)
     {
@@ -524,14 +483,10 @@ string getMagiSequenceString(int array[], int arraySize)
         }
     }
     
-    stringstream ss;
     for (int i = 0; i < length; i++)
     {
-        ss << tailArray[i] << " ";
+        outSequence.push_back(tailArray[i]);
     }
-    
-    // Was not sure if we should return the length or the sequence itself
-    outSequence = ss.str();
     
     delete[] tailArray;
     
@@ -605,8 +560,8 @@ int main()
             magiArray[j] = powerOfMagi;
         }
         
-        int lengthOfLIS = getMagiSequenceInt(magiArray, numOfMagi);
-        graph.addNodeToArray(charmOfRealm, i, lengthOfLIS);
+        vector<int> lis = getMagiSequenceVector(magiArray, numOfMagi);
+        graph.addNodeToArray(charmOfRealm, i, lis);
         
     }
     
