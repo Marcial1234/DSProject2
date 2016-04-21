@@ -268,6 +268,17 @@ public:
         adjNodeList[v2->id].appendNodeToTail(v1);
     }
     
+    void setupGraph()
+    {
+        for(int i = 0; i < numOfVertices; i++)
+        {
+            for(int j = i + 1; j < numOfVertices; j++)
+            {
+                addEdgeBidirectional(nodes[i], nodes[j], getEditDistance(nodes[i]->charm, (int)nodes[i]->charm.length(), nodes[j]->charm, (int)nodes[j]->charm.length()));
+            }
+        }
+    }
+    
     int findIDWithCharm(string charm) {
         Node *p = nodes[0];
         
@@ -309,15 +320,13 @@ public:
         }
     }
     
-    void setupGraph()
-    {
-        for(int i = 0; i < numOfVertices; i++)
-        {
-            for(int j = i + 1; j < numOfVertices; j++)
-            {
-                addEdgeBidirectional(nodes[i], nodes[j], getEditDistance(nodes[i]->charm, (int)nodes[i]->charm.length(), nodes[j]->charm, (int)nodes[j]->charm.length()));
-            }
+    void printNodeLis(int id) {
+        vector<int> lis = nodes[id]->lis;
+        
+        for (int i = 0; i < lis.size(); i++) {
+            cout << lis[i] << " ";
         }
+        cout << "\n";
     }
 };
 
@@ -392,11 +401,18 @@ public:
         else {
             int edgeSum = 0;
             int gemSum = 0;
-            for (int i = 0; i < vec.size(); i++) {
-                cout << vec[i]->charm << endl;
+            
+            for (int i = 0; i < vec.size() - 1; i++) {
+                
+                int editD = getEditDistance(vec[i]->charm, (int)vec[i]->charm.size(), vec[i + 1]->charm, (int)vec[i + 1]->charm.size());
+                edgeSum = edgeSum + editD;
+                
+                for (int j = 0; j < editD; j++) {
+                    gemSum = gemSum + vec[i]->lis[j];
+                }
             }
             
-            cout << edgeSum << endl;
+            cout << edgeSum << " " << gemSum << endl;
         }
     }
     
@@ -447,48 +463,106 @@ int ceilIndex(int array[], int left, int right, int key)
 }
 
 // This gets the ideal squence of magi powers dynamically O(n * log(n))
-vector<int> getMagiSequenceVector(int array[], int arraySize)
-{
+//vector<int> getMagiSequenceVector(int array[], int arraySize)
+//{
+//    
+//    int *tailArray = new int[arraySize];
+//    int length = 0;
+//    
+//    vector<int> outSequence;
+//    
+//    for (int i = 0; i < arraySize; i++)
+//    {
+//        tailArray[i] = 0;
+//    }
+//    
+//    tailArray[0] = array[0];
+//    length = 1;
+//    for (int i = 1; i < arraySize; i++)
+//    {
+//        if (array[i] < tailArray[0])
+//        {
+//            // new smallest value could start new sequence that is better
+//            tailArray[0] = array[i];
+//        }
+//        
+//        else if (array[i] > tailArray[length-1])
+//        {
+//            // array[i] wants to extend largest subsequence
+//            tailArray[length++] = array[i];
+//        }
+//        
+//        else
+//        {
+//            // array[i] wants to be current end candidate of an existing subsequence
+//            tailArray[ceilIndex(tailArray, -1, length-1, array[i])] = array[i];
+//        }
+//    }
+//    
+//    for (int i = 0; i < length; i++)
+//    {
+//        outSequence.push_back(tailArray[i]);
+//    }
+//    
+//    delete[] tailArray;
+//    
+//    return outSequence;
+//}
+
+// Binary search
+int GetCeilIndex(int A[], int T[], int l, int r, int key) {
+    int m;
     
-    int *tailArray = new int[arraySize];
-    int length = 0;
+    while( r - l > 1 ) {
+        m = l + (r - l)/2;
+        if( A[T[m]] >= key )
+            r = m;
+        else
+            l = m;
+    }
+    
+    return r;
+}
+
+vector<int> getMagiSequenceVector(int A[], int size) {
     
     vector<int> outSequence;
     
-    for (int i = 0; i < arraySize; i++)
-    {
-        tailArray[i] = 0;
+    int *tailIndices = new int[size];
+    int *prevIndices = new int[size];
+    int len;
+    
+    memset(tailIndices, 0, sizeof(tailIndices[0])*size);
+    memset(prevIndices, 0xFF, sizeof(prevIndices[0])*size);
+    
+    tailIndices[0] = 0;
+    prevIndices[0] = -1;
+    len = 1; // it will always point to empty location
+    for( int i = 1; i < size; i++ ) {
+        if( A[i] < A[tailIndices[0]] ) {
+            // new smallest value
+            tailIndices[0] = i;
+        } else if( A[i] > A[tailIndices[len-1]] ) {
+            // A[i] wants to extend largest subsequence
+            prevIndices[i] = tailIndices[len-1];
+            tailIndices[len++] = i;
+        } else {
+            // A[i] wants to be a potential condidate of future subsequence
+            // It will replace ceil value in tailIndices
+            int pos = GetCeilIndex(A, tailIndices, -1, len-1, A[i]);
+            
+            prevIndices[i] = tailIndices[pos-1];
+            tailIndices[pos] = i;
+        }
+    }
+    for(int i = tailIndices[len-1]; i >= 0; i = prevIndices[i]) {
+        outSequence.push_back(A[i]);
     }
     
-    tailArray[0] = array[0];
-    length = 1;
-    for (int i = 1; i < arraySize; i++)
-    {
-        if (array[i] < tailArray[0])
-        {
-            // new smallest value could start new sequence that is better
-            tailArray[0] = array[i];
-        }
-        
-        else if (array[i] > tailArray[length-1])
-        {
-            // array[i] wants to extend largest subsequence
-            tailArray[length++] = array[i];
-        }
-        
-        else
-        {
-            // array[i] wants to be current end candidate of an existing subsequence
-            tailArray[ceilIndex(tailArray, -1, length-1, array[i])] = array[i];
-        }
-    }
+    delete[] tailIndices;
+    delete[] prevIndices;
     
-    for (int i = 0; i < length; i++)
-    {
-        outSequence.push_back(tailArray[i]);
-    }
-    
-    delete[] tailArray;
+    std::reverse(outSequence.begin(), outSequence.end());
     
     return outSequence;
 }
