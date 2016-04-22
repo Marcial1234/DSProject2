@@ -506,41 +506,34 @@ vector<int> getMagiSequenceVector(int array[], int size) {
 }
 
 // This is the edit distance dynamically O(l1 x l2)
-int getEditDistance(string word1, int l1, string word2, int l2)
-{
+int getEditDistance(string word1, int l1, string word2, int l2) {
     
     // Table to store all the results
     int resultsArray[l1 + 1][l2 + 1];
     
     // Fill resultsArray[][] bottom up
-    for (int i = 0; i <= l1; i++)
-    {
-        for (int j = 0; j <= l2; j++)
-        {
+    for (int i = 0; i <= l1; i++) {
+        for (int j = 0; j <= l2; j++) {
             
             // word1 = "" we have to add all characters from word2 to word1
-            if (i == 0)
-            {
+            if (i == 0) {
                 // j = number of operations
                 resultsArray[i][j] = j;
             }
             
             // word2 = "" we have to remove all characters from word1
-            else if (j == 0)
-            {
+            else if (j == 0) {
                 // i = number of operations
                 resultsArray[i][j] = i;
             }
             
             // If the last character of each word is the same then move down the words until different
-            else if (word1[i-1] == word2[j-1])
-            {
+            else if (word1[i-1] == word2[j-1]) {
                 resultsArray[i][j] = resultsArray[i-1][j-1];
             }
             
             // If the last character of each word is not the same compute the min frome each operation below
-            else
-            {
+            else {
                 // Insert, Remove, Replace
                 resultsArray[i][j] = 1 + getMin(resultsArray[i][j-1], resultsArray[i-1][j], resultsArray[i-1][j-1]);
             }
@@ -550,23 +543,20 @@ int getEditDistance(string word1, int l1, string word2, int l2)
     return resultsArray[l1][l2];
 }
 
-int main()
-{
+int main() {
     int numOfRealms = 0;
     cin >> numOfRealms;
     
     Graph graph(numOfRealms);
     
-    for (int i = 0; i < numOfRealms; i++)
-    {
+    for (int i = 0; i < numOfRealms; i++) {
         string charmOfRealm = "";
         cin >> charmOfRealm;
         int numOfMagi = 0;
         cin >> numOfMagi;
         int magiArray[numOfMagi];
         
-        for (int j = 0; j < numOfMagi; j++)
-        {
+        for (int j = 0; j < numOfMagi; j++) {
             int powerOfMagi = 0;
             cin >> powerOfMagi;
             magiArray[j] = powerOfMagi;
