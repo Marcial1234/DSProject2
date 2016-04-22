@@ -236,67 +236,81 @@ class Dijkstra {
     
 public:
     
+    // We need a reference to the same graph
     Graph graph = NULL;
     
     Dijkstra(Graph g) {
         graph = g;
     }
     
+    // This does the Dijkstra algorithm (a modified BFS) to find the minimum cost path
     void computePaths(Node *source) {
-        source->minDistance = 0;
-        priority_queue<Node*> vertexQueue;
-        vertexQueue.push(source);
         
-        while (!vertexQueue.empty()) {
-            Node *u = vertexQueue.top();
-            vertexQueue.pop();
+        // We want a priority queue to have the minimum on top
+        source->minDistance = 0;
+        priority_queue<Node*> nodeQueue;
+        
+        // We want to push the starting node on
+        nodeQueue.push(source);
+        
+        // We go until we reach every node in the single connected graph
+        while (!nodeQueue.empty()) {
+            Node *u = nodeQueue.top();
+            nodeQueue.pop();
             
-            // Visit each edge exiting u
+            // Visit each edge that u can reach
             for (Edge *e : u->pubEdges) {
                 Node *v = e->getDestination();
                 double weight = e->getWeight();
                 double distanceThroughU = u->minDistance + weight;
+                
+                // If we get a lower distance and also have enough to do the incantation
                 if (distanceThroughU < v->minDistance && u->lis.size() >= e->getWeight()) {
                     
                     priority_queue<Node*> tempQueue;
                     bool done = false;
-                    while (!vertexQueue.empty()) {
-                        if (vertexQueue.top() == v && !done) {
-                            vertexQueue.pop();
+                    
+                    // We remove the next from our queue
+                    while (!nodeQueue.empty()) {
+                        if (nodeQueue.top() == v && !done) {
+                            nodeQueue.pop();
                             done = true;
                         }
                         else {
-                            Node *p = vertexQueue.top();
+                            Node *p = nodeQueue.top();
                             tempQueue.push(p);
-                            vertexQueue.pop();
+                            nodeQueue.pop();
                         }
                     }
                     
-                    vertexQueue = tempQueue;
+                    // We make put the modified queue back to our nodequeue
+                    nodeQueue = tempQueue;
                     
-                    v->minDistance = distanceThroughU ;
+                    v->minDistance = distanceThroughU;
                     v->previous = u;
-                    vertexQueue.push(v);
-                    
+                    nodeQueue.push(v);
                 }
             }
         }
     }
     
+    // This starts at our end node and follows its path back to the beginning
     vector<Node*> getShortestPathTo(Node *target) {
         vector<Node*> path;
         for (Node *vertex = target; vertex != NULL; vertex = vertex->previous) {
             path.push_back(vertex);
         }
         
+        // We flip it around to get the path from the beginning and not from the end
         std::reverse(path.begin(), path.end());
         
         return path;
     }
     
+    // This prints out the appropriate stuff
     void printPath(vector<Node*> vec, int start, int end) {
         
-        if (graph.nodes[start] != graph.nodes[end] && vec.size() == 1 && vec[vec.size()-1] == graph.nodes[end]) {
+        if (graph.nodes[start] != graph.nodes[end] && vec.size() == 1 && vec[vec.size()-1] == graph.nodes[end] && vec[vec.size()-1]->previous == NULL) {
             cout << "IMPOSSIBLE" << endl;
         }
         else {
@@ -305,9 +319,11 @@ public:
             
             for (int i = 0; i < vec.size() - 1; i++) {
                 
+                // We get the edit distance between the two nodes
                 int editD = getEditDistance(vec[i]->charm, (int)vec[i]->charm.size(), vec[i + 1]->charm, (int)vec[i + 1]->charm.size());
                 edgeSum = edgeSum + editD;
                 
+                // We sum only the editD number from the longest increasing sequence
                 for (int j = 0; j < editD; j++) {
                     gemSum = gemSum + vec[i]->lis[j];
                 }
@@ -317,6 +333,7 @@ public:
         }
     }
     
+    // We need to reset the nodes to having infinity minDistance and no previous node pointer
     void resetNodes() {
         for (int i = 0; i < graph.pubNumOfVertices; i++) {
             graph.nodes[i]->previous = NULL;
@@ -324,6 +341,7 @@ public:
         }
     }
     
+    // This is our controller method we call to do everything based on the paths
     void doDijkstra(int start, int end) {
         if (start == -1 || end == -1) {
             cout << "IMPOSSIBLE" << endl;
@@ -366,6 +384,7 @@ vector<int> getMagiSequenceVector(int array[], int size) {
     int *prevIndices = new int[size];
     int length;
     
+    // Set both arrays to the default values at the start
     memset(tailIndices, 0, sizeof(tailIndices[0])*size);
     memset(prevIndices, 0xFF, sizeof(prevIndices[0])*size);
     
@@ -392,6 +411,7 @@ vector<int> getMagiSequenceVector(int array[], int size) {
         }
     }
     
+    // We go through our original array based on the indices from tailIndices
     for(int i = tailIndices[length-1]; i >= 0; i = prevIndices[i]) {
         outSequence.push_back(array[i]);
     }
@@ -399,6 +419,7 @@ vector<int> getMagiSequenceVector(int array[], int size) {
     delete[] tailIndices;
     delete[] prevIndices;
     
+    // We will need to flip it back around because it pushes them by backtracking
     std::reverse(outSequence.begin(), outSequence.end());
     
     return outSequence;
