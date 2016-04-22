@@ -471,21 +471,20 @@ vector<int> getMagiSequenceVector(int array[], int size) {
     
     tailIndices[0] = 0;
     prevIndices[0] = -1;
-    length = 1; // it will always point to empty location
+    length = 1;
     
-    for( int i = 1; i < size; i++ ) {
+    for(int i = 1; i < size; i++) {
         if(array[i] < array[tailIndices[0]]) {
-            // new smallest value
+            // We have encountered the new smallest value
             tailIndices[0] = i;
         }
         else if(array[i] > array[tailIndices[length-1]]) {
-            // A[i] wants to extend largest subsequence
+            // Our array wants to extend the longest subsequence
             prevIndices[i] = tailIndices[length-1];
             tailIndices[length++] = i;
         }
         else {
-            // A[i] wants to be a potential condidate of future subsequence
-            // It will replace ceil value in tailIndices
+            // Our array element is a possibly in a future subsequence
             int pos = getCeilingIndex(array, tailIndices, -1, length-1, array[i]);
             
             prevIndices[i] = tailIndices[pos-1];
