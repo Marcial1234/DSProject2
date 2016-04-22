@@ -61,6 +61,7 @@ public:
 
 // This is a basic node class
 class Node {
+    
     // list of every edge from this node
     vector<Edge*> edges;
     
@@ -112,35 +113,6 @@ public:
         head = NULL;
         publicHead = NULL;
         tail = NULL;
-    }
-    
-    int getAbs(int num) {
-        
-        int ans = 0;
-        
-        if (num < 0) {
-            ans = 0 - num;
-        }
-        else if (num > 0) {
-            ans = num;
-        }
-        
-        return ans;
-    }
-    
-    void addNodeToTail(string value, int id) {
-        Node *p;
-        
-        if(head == NULL) {
-            head = new Node(value, id, NULL);
-            publicHead = head;
-            tail = head;
-        }
-        else {
-            p = tail;
-            p->next = new Node(value, id, NULL);
-            tail = p->next;
-        }
     }
     
     void appendNodeToTail(Node *node) {
@@ -198,37 +170,6 @@ public:
     }
     
     void addEdgeBidirectional(Node *v1, Node *v2, int weight) {
-        v1->addEdge(v2, weight);
-        adjNodeList[v1->id].appendNodeToTail(v2);
-        
-        v2->addEdge(v1, weight);
-        adjNodeList[v2->id].appendNodeToTail(v1);
-    }
-    
-    void createV1NodeAndEdge(string charm, int id, Node *v2, int weight) {
-        Node *v1 = new Node(charm, id);
-        
-        v1->addEdge(v2, weight);
-        adjNodeList[v1->id].appendNodeToTail(v2);
-        
-        v2->addEdge(v1, weight);
-        adjNodeList[v2->id].appendNodeToTail(v1);
-    }
-    
-    void createV2NodeAndEdge(Node *v1, string charm, int id, int weight) {
-        Node *v2 = new Node(charm, id);
-        
-        v1->addEdge(v2, weight);
-        adjNodeList[v1->id].appendNodeToTail(v2);
-        
-        v2->addEdge(v1, weight);
-        adjNodeList[v2->id].appendNodeToTail(v1);
-    }
-    
-    void createBothNodesAndEdge(string charm1, int id1, string charm2, int id2, int weight) {
-        Node *v1 = new Node(charm1, id1);
-        Node *v2 = new Node(charm2, id2);
-        
         v1->addEdge(v2, weight);
         adjNodeList[v1->id].appendNodeToTail(v2);
         
