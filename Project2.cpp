@@ -444,17 +444,13 @@ int getMin(int a, int b, int c)
 }
 
 // Binary search for index no recursion
-int ceilIndex(int array[], int left, int right, int key)
-{
+int getCeilingIndex(int array[], int tail[], int left, int right, int key) {
+    int mid = -1;
     
-    while (right - left > 1)
-    {
-        // Get middle index, same as saying (right + left)/2 but safer
-        int mid = left + (right - left)/2;
-        
-        if (array[mid] >= key)
+    while(right - left > 1) {
+        mid = left + (right - left)/2;
+        if(array[tail[mid]] >= key)
             right = mid;
-        
         else
             left = mid;
     }
@@ -462,101 +458,43 @@ int ceilIndex(int array[], int left, int right, int key)
     return right;
 }
 
-// This gets the ideal squence of magi powers dynamically O(n * log(n))
-//vector<int> getMagiSequenceVector(int array[], int arraySize)
-//{
-//
-//    int *tailArray = new int[arraySize];
-//    int length = 0;
-//
-//    vector<int> outSequence;
-//
-//    for (int i = 0; i < arraySize; i++)
-//    {
-//        tailArray[i] = 0;
-//    }
-//
-//    tailArray[0] = array[0];
-//    length = 1;
-//    for (int i = 1; i < arraySize; i++)
-//    {
-//        if (array[i] < tailArray[0])
-//        {
-//            // new smallest value could start new sequence that is better
-//            tailArray[0] = array[i];
-//        }
-//
-//        else if (array[i] > tailArray[length-1])
-//        {
-//            // array[i] wants to extend largest subsequence
-//            tailArray[length++] = array[i];
-//        }
-//
-//        else
-//        {
-//            // array[i] wants to be current end candidate of an existing subsequence
-//            tailArray[ceilIndex(tailArray, -1, length-1, array[i])] = array[i];
-//        }
-//    }
-//
-//    for (int i = 0; i < length; i++)
-//    {
-//        outSequence.push_back(tailArray[i]);
-//    }
-//
-//    delete[] tailArray;
-//
-//    return outSequence;
-//}
-
-// Binary search
-int GetCeilIndex(int A[], int T[], int l, int r, int key) {
-    int m;
-    
-    while( r - l > 1 ) {
-        m = l + (r - l)/2;
-        if( A[T[m]] >= key )
-            r = m;
-        else
-            l = m;
-    }
-    
-    return r;
-}
-
-vector<int> getMagiSequenceVector(int A[], int size) {
+vector<int> getMagiSequenceVector(int array[], int size) {
     
     vector<int> outSequence;
     
     int *tailIndices = new int[size];
     int *prevIndices = new int[size];
-    int len;
+    int length;
     
     memset(tailIndices, 0, sizeof(tailIndices[0])*size);
     memset(prevIndices, 0xFF, sizeof(prevIndices[0])*size);
     
     tailIndices[0] = 0;
     prevIndices[0] = -1;
-    len = 1; // it will always point to empty location
+    length = 1; // it will always point to empty location
+    
     for( int i = 1; i < size; i++ ) {
-        if( A[i] < A[tailIndices[0]] ) {
+        if(array[i] < array[tailIndices[0]]) {
             // new smallest value
             tailIndices[0] = i;
-        } else if( A[i] > A[tailIndices[len-1]] ) {
+        }
+        else if(array[i] > array[tailIndices[length-1]]) {
             // A[i] wants to extend largest subsequence
-            prevIndices[i] = tailIndices[len-1];
-            tailIndices[len++] = i;
-        } else {
+            prevIndices[i] = tailIndices[length-1];
+            tailIndices[length++] = i;
+        }
+        else {
             // A[i] wants to be a potential condidate of future subsequence
             // It will replace ceil value in tailIndices
-            int pos = GetCeilIndex(A, tailIndices, -1, len-1, A[i]);
+            int pos = getCeilingIndex(array, tailIndices, -1, length-1, array[i]);
             
             prevIndices[i] = tailIndices[pos-1];
             tailIndices[pos] = i;
         }
     }
-    for(int i = tailIndices[len-1]; i >= 0; i = prevIndices[i]) {
-        outSequence.push_back(A[i]);
+    
+    for(int i = tailIndices[length-1]; i >= 0; i = prevIndices[i]) {
+        outSequence.push_back(array[i]);
     }
     
     delete[] tailIndices;
@@ -654,6 +592,5 @@ int main()
     dj.doDijkstra(startIndex, endIndex);
     dj.doDijkstra(endIndex, startIndex);
     
-    cout << "\n";
     return 0;
 }
