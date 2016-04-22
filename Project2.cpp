@@ -85,12 +85,14 @@ public:
         next = n;
     }
     
+    // Adds an edge object between this node and another
     void addEdge(Node *node, int weight) {
         Edge *myEdge = new Edge(this, node, weight);
         edges.push_back(myEdge);
         pubEdges = edges;
     }
     
+    // This prints all the edges and their end destinations
     void printEdges() {
         cout << charm << ":" << endl;
         for (int i = 0; i < edges.size(); i++) {
@@ -115,6 +117,7 @@ public:
         tail = NULL;
     }
     
+    // Adds a node to the end of the linked list
     void appendNodeToTail(Node *node) {
         Node *p;
         
@@ -130,6 +133,7 @@ public:
         }
     }
     
+    // Prints the charm of each node in the linkedlist
     void printListOfValues() {
         Node *p = head;
         while(p != NULL) {
@@ -142,18 +146,21 @@ public:
 
 // This is a basic graph class
 class Graph {
-    int numOfVertices;
+    int numOfNodes;
     LinkedList *adjNodeList;
     
 public:
     
     // Looks weird but is a dynamic array of node pointers
+    // It contains all nodes in this particular graph
     Node* *nodes;
-    int pubNumOfVertices;
+    
+    // A public reference to the number of nodes so others can't mess with it
+    int pubNumOfNodes;
     
     Graph(int numOfVertices) {
-        this->numOfVertices = numOfVertices;
-        pubNumOfVertices = numOfVertices;
+        this->numOfNodes = numOfVertices;
+        pubNumOfNodes = numOfVertices;
         adjNodeList = new LinkedList[numOfVertices];
         nodes = new Node*[numOfVertices];
     }
@@ -177,14 +184,16 @@ public:
         adjNodeList[v2->id].appendNodeToTail(v1);
     }
     
+    // This adds edges between all nodes
     void setupGraph() {
-        for(int i = 0; i < numOfVertices; i++) {
-            for(int j = i + 1; j < numOfVertices; j++) {
+        for(int i = 0; i < numOfNodes; i++) {
+            for(int j = i + 1; j < numOfNodes; j++) {
                 addEdgeBidirectional(nodes[i], nodes[j], getEditDistance(nodes[i]->charm, (int)nodes[i]->charm.length(), nodes[j]->charm, (int)nodes[j]->charm.length()));
             }
         }
     }
     
+    // This will return the node id that has a desired charm
     int findIDWithCharm(string charm) {
         Node *p = nodes[0];
         
@@ -200,27 +209,31 @@ public:
         }
     }
     
-    void printAllVertices() {
-        for (int i = 0; i < numOfVertices; i++) {
-            cout << "From vertex " << i << ":\n";
+    // Prints all nodes that can be reached from all nodes
+    void printAllNodes() {
+        for (int i = 0; i < numOfNodes; i++) {
+            cout << "From node " << i << ":\n";
             adjNodeList[i].printListOfValues();
             cout << "\n";
         }
     }
     
-    void printVerticesFrom(int id) {
-        cout << "From vertex " << id << ":\n";
+    // Prints all nodes that can be reached from one node
+    void printNodeFrom(int id) {
+        cout << "From node " << id << ":\n";
         adjNodeList[id].printListOfValues();
     }
     
+    // This prints the nodes a node can see and the weight of each edge between them
     void printEdges() {
-        for (int i = 0; i < numOfVertices; i++) {
-            cout << "From vertex " << i << ":\n";
+        for (int i = 0; i < numOfNodes; i++) {
+            cout << "From node " << i << ":\n";
             nodes[i]->printEdges();
             cout << "\n";
         }
     }
     
+    // This prints the lis of each node
     void printNodeLis(int id) {
         vector<int> lis = nodes[id]->lis;
         
@@ -335,7 +348,7 @@ public:
     
     // We need to reset the nodes to having infinity minDistance and no previous node pointer
     void resetNodes() {
-        for (int i = 0; i < graph.pubNumOfVertices; i++) {
+        for (int i = 0; i < graph.pubNumOfNodes; i++) {
             graph.nodes[i]->previous = NULL;
             graph.nodes[i]->minDistance = std::numeric_limits<double>::infinity();
         }
@@ -366,11 +379,14 @@ int getCeilingIndex(int array[], int tail[], int left, int right, int key) {
     int mid = -1;
     
     while(right - left > 1) {
+        // This is the same as saying (right + left)/2 but safer for a large left
         mid = left + (right - left)/2;
-        if(array[tail[mid]] >= key)
+        if(array[tail[mid]] >= key) {
             right = mid;
-        else
+        }
+        else {
             left = mid;
+        }
     }
     
     return right;
@@ -482,6 +498,7 @@ int main() {
             magiArray[j] = powerOfMagi;
         }
         
+        // This will get our longest increasing subsequence
         vector<int> lis = getMagiSequenceVector(magiArray, numOfMagi);
         graph.addNodeToArray(charmOfRealm, i, lis);
         
@@ -498,6 +515,7 @@ int main() {
     int startIndex = graph.findIDWithCharm(kaelCharm);
     int endIndex = graph.findIDWithCharm(destCharm);
     
+    // We need to print the proper values for the way there and the way back
     Dijkstra dj(graph);
     dj.doDijkstra(startIndex, endIndex);
     dj.doDijkstra(endIndex, startIndex);
