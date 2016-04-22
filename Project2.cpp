@@ -7,7 +7,6 @@
 //
 
 #include <iostream>
-#include <sstream>
 #include <vector>
 #include <queue>
 
@@ -16,7 +15,6 @@ using std::cout;
 using std::string;
 using std::min;
 using std::endl;
-using std::stringstream;
 using std::vector;
 using std::priority_queue;
 using std::queue;
