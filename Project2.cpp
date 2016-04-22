@@ -2,8 +2,8 @@
 //  main.cpp
 //  Project2
 //
-//  Created by Nikhil Thota on 4/19/16.
-//  Copyright © 2016 NikhilThota. All rights reserved.
+//  Created by Nicholas Miller on 4/19/16.
+//  Copyright © 2016 nickbryanmiller. All rights reserved.
 //
 
 #include <iostream>
@@ -33,43 +33,34 @@ int getMagiSequenceInt(int array[], int arraySize);
 vector<int> getMagiSequenceVector(int array[], int arraySize);
 int getEditDistance(string word1, int l1, string word2, int l2);
 
-// Global queue for keepin track of the important edges
-//queue<int> globalEdgeQueue;
-
 // This is a basic edge class that connects two nodes
-class Edge
-{
+class Edge {
     Node *origin;
     Node *destination;
     int weight;
     
 public:
-    Edge(Node *beginNode, Node *endNode, int w)
-    {
+    Edge(Node *beginNode, Node *endNode, int w) {
         origin = beginNode;
         destination = endNode;
         weight = w;
     }
     
-    Node* getOrigin()
-    {
+    Node* getOrigin() {
         return origin;
     }
     
-    Node* getDestination()
-    {
+    Node* getDestination() {
         return destination;
     }
     
-    int getWeight()
-    {
+    int getWeight() {
         return weight;
     }
 };
 
 // This is a basic node class
-class Node
-{
+class Node {
     // list of every edge from this node
     vector<Edge*> edges;
     
@@ -82,31 +73,26 @@ public:
     vector<Edge*> pubEdges;
     Node *previous = NULL;
     
-    Node(string x, int identity)
-    {
+    Node(string x, int identity) {
         charm = x;
         id = identity;
         next = NULL;
     }
-    Node(string x, int identity, Node *n)
-    {
+    Node(string x, int identity, Node *n) {
         charm = x;
         id = identity;
         next = n;
     }
     
-    void addEdge(Node *node, int weight)
-    {
+    void addEdge(Node *node, int weight) {
         Edge *myEdge = new Edge(this, node, weight);
         edges.push_back(myEdge);
         pubEdges = edges;
     }
     
-    void printEdges()
-    {
+    void printEdges() {
         cout << charm << ":" << endl;
-        for (int i = 0; i < edges.size(); i++)
-        {
+        for (int i = 0; i < edges.size(); i++) {
             Edge *edge = edges[i];
             cout << "Dest: " << edge->getDestination()->charm << " with weight: " << edge->getWeight() << endl;
         }
@@ -115,23 +101,20 @@ public:
 };
 
 // This is a basic linked list class
-class LinkedList
-{
+class LinkedList {
     Node *head;
     Node *tail;
 public:
     
     Node *publicHead;
     
-    LinkedList()
-    {
+    LinkedList() {
         head = NULL;
         publicHead = NULL;
         tail = NULL;
     }
     
-    int getAbs(int num)
-    {
+    int getAbs(int num) {
         
         int ans = 0;
         
@@ -145,44 +128,37 @@ public:
         return ans;
     }
     
-    void addNodeToTail(string value, int id)
-    {
+    void addNodeToTail(string value, int id) {
         Node *p;
         
-        if(head == NULL)
-        {
+        if(head == NULL) {
             head = new Node(value, id, NULL);
             publicHead = head;
             tail = head;
         }
-        else
-        {
+        else {
             p = tail;
             p->next = new Node(value, id, NULL);
             tail = p->next;
         }
     }
     
-    void appendNodeToTail(Node *node)
-    {
+    void appendNodeToTail(Node *node) {
         Node *p;
         
-        if(head == NULL)
-        {
+        if(head == NULL) {
             head = node;
             publicHead = head;
             tail = head;
         }
-        else
-        {
+        else {
             p = tail;
             p->next = node;
             tail = p->next;
         }
     }
     
-    void printListOfValues()
-    {
+    void printListOfValues() {
         Node *p = head;
         while(p != NULL) {
             cout << p->charm << " ";
@@ -193,8 +169,7 @@ public:
 };
 
 // This is a basic graph class
-class Graph
-{
+class Graph {
     int numOfVertices;
     LinkedList *adjNodeList;
     
@@ -204,29 +179,25 @@ public:
     Node* *nodes;
     int pubNumOfVertices;
     
-    Graph(int numOfVertices)
-    {
+    Graph(int numOfVertices) {
         this->numOfVertices = numOfVertices;
         pubNumOfVertices = numOfVertices;
         adjNodeList = new LinkedList[numOfVertices];
         nodes = new Node*[numOfVertices];
     }
     
-    void addNodeToArray(string charm, int id, vector<int> lis)
-    {
+    void addNodeToArray(string charm, int id, vector<int> lis) {
         Node *node = new Node(charm, id);
         node->lis = lis;
         nodes[id] = node;
     }
     
-    void addEdgeUnidirectional(Node *v1, Node *v2, int weight)
-    {
+    void addEdgeUnidirectional(Node *v1, Node *v2, int weight) {
         v1->addEdge(v2, weight);
         adjNodeList[v1->id].appendNodeToTail(v2);
     }
     
-    void addEdgeBidirectional(Node *v1, Node *v2, int weight)
-    {
+    void addEdgeBidirectional(Node *v1, Node *v2, int weight) {
         v1->addEdge(v2, weight);
         adjNodeList[v1->id].appendNodeToTail(v2);
         
@@ -234,8 +205,7 @@ public:
         adjNodeList[v2->id].appendNodeToTail(v1);
     }
     
-    void createV1NodeAndEdge(string charm, int id, Node *v2, int weight)
-    {
+    void createV1NodeAndEdge(string charm, int id, Node *v2, int weight) {
         Node *v1 = new Node(charm, id);
         
         v1->addEdge(v2, weight);
@@ -245,8 +215,7 @@ public:
         adjNodeList[v2->id].appendNodeToTail(v1);
     }
     
-    void createV2NodeAndEdge(Node *v1, string charm, int id, int weight)
-    {
+    void createV2NodeAndEdge(Node *v1, string charm, int id, int weight) {
         Node *v2 = new Node(charm, id);
         
         v1->addEdge(v2, weight);
@@ -256,8 +225,7 @@ public:
         adjNodeList[v2->id].appendNodeToTail(v1);
     }
     
-    void createBothNodesAndEdge(string charm1, int id1, string charm2, int id2, int weight)
-    {
+    void createBothNodesAndEdge(string charm1, int id1, string charm2, int id2, int weight) {
         Node *v1 = new Node(charm1, id1);
         Node *v2 = new Node(charm2, id2);
         
@@ -268,12 +236,9 @@ public:
         adjNodeList[v2->id].appendNodeToTail(v1);
     }
     
-    void setupGraph()
-    {
-        for(int i = 0; i < numOfVertices; i++)
-        {
-            for(int j = i + 1; j < numOfVertices; j++)
-            {
+    void setupGraph() {
+        for(int i = 0; i < numOfVertices; i++) {
+            for(int j = i + 1; j < numOfVertices; j++) {
                 addEdgeBidirectional(nodes[i], nodes[j], getEditDistance(nodes[i]->charm, (int)nodes[i]->charm.length(), nodes[j]->charm, (int)nodes[j]->charm.length()));
             }
         }
@@ -294,26 +259,21 @@ public:
         }
     }
     
-    void printAllVertices()
-    {
-        for (int i = 0; i < numOfVertices; i++)
-        {
+    void printAllVertices() {
+        for (int i = 0; i < numOfVertices; i++) {
             cout << "From vertex " << i << ":\n";
             adjNodeList[i].printListOfValues();
             cout << "\n";
         }
     }
     
-    void printVerticesFrom(int id)
-    {
+    void printVerticesFrom(int id) {
         cout << "From vertex " << id << ":\n";
         adjNodeList[id].printListOfValues();
     }
     
-    void printEdges()
-    {
-        for (int i = 0; i < numOfVertices; i++)
-        {
+    void printEdges() {
+        for (int i = 0; i < numOfVertices; i++) {
             cout << "From vertex " << i << ":\n";
             nodes[i]->printEdges();
             cout << "\n";
@@ -337,7 +297,7 @@ public:
     
     Graph graph = NULL;
     
-    Dijkstra(Graph g){
+    Dijkstra(Graph g) {
         graph = g;
     }
     
@@ -438,8 +398,7 @@ public:
 };
 
 // Get the min of three numbers
-int getMin(int a, int b, int c)
-{
+int getMin(int a, int b, int c) {
     return min(min(a, b), c);
 }
 
