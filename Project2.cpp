@@ -9,6 +9,9 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <cstring>
+#include <limits>
+#include <algorithm>
 
 using std::cin;
 using std::cout;
@@ -18,6 +21,7 @@ using std::endl;
 using std::vector;
 using std::priority_queue;
 using std::queue;
+using std::memset;
 
 // Initialize Classes
 class Node;
@@ -248,9 +252,9 @@ class Dijkstra {
 public:
     
     // We need a reference to the same graph
-    Graph graph = NULL;
+    Graph *graph = NULL;
     
-    Dijkstra(Graph g) {
+    Dijkstra(Graph *g) {
         graph = g;
     }
     
@@ -321,7 +325,7 @@ public:
     // This prints out the appropriate stuff
     void printPath(vector<Node*> vec, int start, int end) {
         
-        if (graph.nodes[start] != graph.nodes[end] && vec.size() == 1 && vec[vec.size()-1] == graph.nodes[end] && vec[vec.size()-1]->previous == NULL) {
+        if (graph->nodes[start] != graph->nodes[end] && vec.size() == 1 && vec[vec.size()-1] == graph->nodes[end] && vec[vec.size()-1]->previous == NULL) {
             cout << "IMPOSSIBLE" << endl;
         }
         else {
@@ -346,9 +350,9 @@ public:
     
     // We need to reset the nodes to having infinity minDistance and no previous node pointer
     void resetNodes() {
-        for (int i = 0; i < graph.pubNumOfNodes; i++) {
-            graph.nodes[i]->previous = NULL;
-            graph.nodes[i]->minDistance = std::numeric_limits<double>::infinity();
+        for (int i = 0; i < graph->pubNumOfNodes; i++) {
+            graph->nodes[i]->previous = NULL;
+            graph->nodes[i]->minDistance = std::numeric_limits<double>::infinity();
         }
     }
     
@@ -359,8 +363,8 @@ public:
         }
         else {
             resetNodes();
-            computePaths(graph.nodes[start]);
-            vector<Node*> result = getShortestPathTo(graph.nodes[end]);
+            computePaths(graph->nodes[start]);
+            vector<Node*> result = getShortestPathTo(graph->nodes[end]);
             
             printPath(result, start, end);
         }
@@ -399,8 +403,8 @@ vector<int> getMagiSequenceVector(int array[], int size) {
     int length;
     
     // Set both arrays to the default values at the start
-    memset(tailIndices, 0, sizeof(tailIndices[0])*size);
-    memset(prevIndices, 0xFF, sizeof(prevIndices[0])*size);
+    std::memset(tailIndices, 0, sizeof(tailIndices[0])*size);
+    std::memset(prevIndices, 0xFF, sizeof(prevIndices[0])*size);
     
     tailIndices[0] = 0;
     prevIndices[0] = -1;
@@ -514,7 +518,7 @@ int main() {
     int endIndex = graph.findIDWithCharm(destCharm);
     
     // We need to print the proper values for the way there and the way back
-    Dijkstra dj(graph);
+    Dijkstra dj(&graph);
     dj.doDijkstra(startIndex, endIndex);
     dj.doDijkstra(endIndex, startIndex);
     
